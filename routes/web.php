@@ -21,6 +21,7 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/update-avatar', [ProfileController::class, 'updateAvatar'])->name('update-avatar');
     Route::post('update-password', [ProfileController::class, 'update_password'])->name('update-password');
     Route::post('/custom-logout', [CustomLogoutController::class, 'logout'])->name('custom.logout');
 });
@@ -48,6 +49,8 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         Route::post('schedules/walkin', [ServicesController::class, 'admin_walkin'])->name('admin-walkin');
         Route::get('services', [ServicesController::class, 'fetch_service'])->name('fetch-admin-services');
         Route::get('schedule/validate/{date}', [SchedulesController::class, 'date_validation'])->name('date.validate');
+
+        Route::post('schedule/today', [SchedulesController::class, 'markNotAttended'])->name('appointments.updateStatus');
     });
 });
 

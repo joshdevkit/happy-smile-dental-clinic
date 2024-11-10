@@ -77,4 +77,27 @@ class ProfileController extends Controller
 
         return redirect()->back()->with('success', 'Profile updated successfully!');
     }
+
+
+    public function updateAvatar(Request $request)
+    {
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            $user = User::find(auth()->id());
+
+            if ($user->avatar && file_exists(public_path('avatar/' . $user->avatar))) {
+                unlink(public_path('avatar/' . $user->avatar));
+            }
+
+            $avatar = $request->file('avatar');
+            $fileName = time() . '_' . $avatar->getClientOriginalName();
+
+            $avatar->move(public_path('avatar'), $fileName);
+
+            $user->update(['avatar' => $fileName]);
+
+            return redirect()->back()->with('success', 'Avatar has been Updated');
+        }
+
+        return redirect()->back()->with('error', 'Invalid avatar file');
+    }
 }

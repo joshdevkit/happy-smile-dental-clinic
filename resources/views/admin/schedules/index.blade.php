@@ -196,12 +196,12 @@
                                     <label>Registered Client? </label>
                                     <div class="form-check">
                                         <input type="radio" class="form-check-input" id="forRegistered"
-                                            name="classification" value="0">
+                                            name="classification" value="1">
                                         <label class="form-check-label" for="forRegistered">Registered</label>
                                     </div>
                                     <div class="form-check">
                                         <input type="radio" class="form-check-input" id="forUnregistered"
-                                            name="classification" value="1">
+                                            name="classification" value="0">
                                         <label class="form-check-label" for="forUnregistered">Unregistered</label>
                                     </div>
                                 </div>
@@ -455,7 +455,7 @@
 
             $('input[name="classification"]').on('change', function() {
                 var classification = $(this).val();
-                if (classification === '1') {
+                if (classification === '0') {
                     $('#clientName').removeAttr('readonly')
                     $('#clientName').closest('.form-group').show();
                     $('#clientEmail').closest('.form-group').hide();

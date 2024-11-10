@@ -181,4 +181,21 @@ class SchedulesController extends Controller
             return redirect()->back()->with('error', 'You are not able to change the date of the appointment that does not belong to you.');
         }
     }
+
+
+    public function markNotAttended(Request $request)
+    {
+        $validated = $request->validate([
+            'schedule_id' => 'required|exists:client_schedules,id',
+        ]);
+
+        $appointment = ClientSchedules::findOrFail($validated['schedule_id']);
+        $appointment->status = "Not Attended";
+        $appointment->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Appointment status updated successfully.',
+        ]);
+    }
 }

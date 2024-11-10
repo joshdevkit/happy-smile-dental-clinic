@@ -120,7 +120,7 @@
 
     <div class="modal fade" id="serviceModal" tabindex="-1" role="dialog" aria-labelledby="serviceModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -130,46 +130,54 @@
                 <div class="modal-body">
                     <form id="submitForm" action="{{ route('current-schedules.store') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="selectedSchedID" id="selectedSchedID">
-                        <div class="form-group">
-                            <label for="serviceSelect">Patient Name</label>
-                            <input type="text" disabled
-                                value="{{ Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name }}"
-                                class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="date_added">Date</label>
-                            <input readonly type="text" name="date_added" id="date_added"
-                                class="form-control validate">
-                        </div>
-                        <div class="form-group">
-                            <label for="serviceSelect">Choose Service</label>
-                            <select class="form-control validate" id="serviceSelect" name="service_id">
-                                <option value="">Select a service</option>
-                                @foreach ($services as $service)
-                                    <option value="{{ $service->id }}" data-duration="{{ $service->duration }}">
-                                        {{ $service->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="startTimeData">Start Time</label>
-                            <input type="text" name="startTimeData" id="startTimeData" class="form-control validate">
-                        </div>
-                        <div class="form-group">
-                            <label for="endTimeData">End Time</label>
-                            <input type="text" name="endTimeData" id="endTimeData" class="form-control validate">
-                        </div>
-                        <div class="form-group">
-                            <label for="servicePrice">Service Price</label>
-                            <input readonly type="text" name="servicePriceselected" id="servicePriceselected"
-                                class="form-control ">
-                        </div>
-                        <div class="form-group">
-                            <label for="serviceReserveFee">Reservation Fee</label>
-                            <input readonly type="text" name="serviceReserveFee" id="serviceReserveFee"
-                                class="form-control ">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="hidden" name="selectedSchedID" id="selectedSchedID">
+                                <div class="form-group">
+                                    <label for="serviceSelect">Patient Name</label>
+                                    <input type="text" disabled
+                                        value="{{ Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name }}"
+                                        class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="date_added">Date</label>
+                                    <input readonly type="text" name="date_added" id="date_added"
+                                        class="form-control validate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="serviceSelect">Choose Service</label>
+                                    <select class="form-control validate" id="serviceSelect" name="service_id">
+                                        <option value="">Select a service</option>
+                                        @foreach ($services as $service)
+                                            <option value="{{ $service->id }}" data-duration="{{ $service->duration }}">
+                                                {{ $service->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="startTimeData">Start Time</label>
+                                    <input type="text" name="startTimeData" id="startTimeData"
+                                        class="form-control validate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="endTimeData">End Time</label>
+                                    <input type="text" name="endTimeData" id="endTimeData"
+                                        class="form-control validate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="servicePrice">Service Price</label>
+                                    <input readonly type="text" name="servicePriceselected" id="servicePriceselected"
+                                        class="form-control ">
+                                </div>
+                                <div class="form-group">
+                                    <label for="serviceReserveFee">Reservation Fee</label>
+                                    <input readonly type="text" name="serviceReserveFee" id="serviceReserveFee"
+                                        class="form-control ">
+                                </div>
+                            </div>
                         </div>
                 </div>
                 <div class="modal-footer">

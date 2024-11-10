@@ -82,7 +82,8 @@
                                     </td>
 
                                     <td>
-                                        <button class="btn btn-danger btn-sm">Unattended</button>
+                                        <button type="button" class="btn btn-danger btn-sm unattended"
+                                            data-id="{{ $schedule->schedule_id }}">Unattended</button>
                                         <button class="btn btn-success btn-sm">Paid</button>
                                     </td>
                                 </tr>
@@ -97,4 +98,61 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.unattended', function() {
+                var schedule_id = $(this).data('id')
+                Swal.fire({
+                    title: "Mark this Appointment as Unattended ?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Proceed"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route('appointments.updateStatus') }}',
+                            method: 'POST',
+                            data: {
+
+                                schedule_id: schedule_id,
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: "Marked as Unattended!",
+                                        text: "The appointment has been marked as Not Attended.",
+                                        icon: "success"
+                                    }).then(() => {
+                                        location
+                                            .reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: "Error!",
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "An error occurred while updating the appointment.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
+            })
+        });
+    </script>
 @endsection

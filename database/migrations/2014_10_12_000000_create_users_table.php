@@ -26,6 +26,7 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('avatar');
             $table->rememberToken();
             $table->timestamps();
         });

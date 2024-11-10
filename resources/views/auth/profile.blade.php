@@ -45,14 +45,16 @@
                         <h3 class="card-title">Profile</h3>
                     </div>
                     <div class="card-body text-center">
-                        <form action="" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('update-avatar') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3 position-relative">
                                 <label for="avatarInput" class="d-inline-block">
-                                    <img id="avatar" src="{{ asset('client/dist/img/default-150x150.png') }}"
+                                    <img id="avatar"
+                                        src="{{ auth()->user()->avatar ? asset('avatar/' . auth()->user()->avatar) : asset('client/dist/img/default-150x150.png') }}"
                                         class="rounded-circle" alt="User Avatar"
                                         style="width: 150px; height: 150px; cursor: pointer; border: 1px solid black;">
                                 </label>
+
                                 <input type="file" id="avatarInput" name="avatar" accept="image/*"
                                     onchange="previewImage(event)" class="d-none">
                             </div>

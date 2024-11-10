@@ -79,7 +79,7 @@ class ServicesController extends Controller
     {
         $classification = $request->input('classification');
 
-        if ($classification == '0') {
+        if ($classification == '1') {
             $services = Services::all();
         } else {
             $services = Services::where('classification', $classification)->get();
@@ -102,7 +102,7 @@ class ServicesController extends Controller
             'clientEmail' => [
                 'nullable',
                 'email',
-                'required_if:classification,0'
+                'required_if:classification,1'
             ],
             'selectedSchedID' => 'required|exists:schedules,id',
         ], [
