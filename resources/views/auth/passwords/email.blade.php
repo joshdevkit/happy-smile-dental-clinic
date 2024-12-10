@@ -11,6 +11,15 @@
                         If you forgot your email. Please <strong class="text-primary">Contact Us.</strong>
                     </div>
                     <div class="card-body border-0 bg-white">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <form method="POST" action="{{ route('password.email') }}">
                             @csrf
                             <div class="form-group">

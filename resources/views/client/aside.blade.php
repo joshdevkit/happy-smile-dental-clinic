@@ -41,7 +41,11 @@
                     </a>
                 </li>
                 <li
-                    class="nav-item {{ request()->routeIs('my-appointment') || request()->routeIs('appointment-history') ? 'menu-open' : '' }}">
+                    class="nav-item {{ request()->routeIs('my-appointment') ||
+                    request()->routeIs('appointment-history') ||
+                    request()->routeIs('my-follow-ups')
+                        ? 'menu-open'
+                        : '' }}">
                     <a href="#" class="nav-link  {{ request()->routeIs('my-appointment') ? 'active-link' : '' }}">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>
@@ -62,6 +66,13 @@
                                 class="nav-link {{ request()->routeIs('appointment-history') ? 'active-link' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Appointment History</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('my-follow-ups') }}"
+                                class="nav-link {{ request()->routeIs('my-follow-ups') ? 'active-link' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Followup Request</p>
                             </a>
                         </li>
 

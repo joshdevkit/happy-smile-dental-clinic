@@ -51,7 +51,7 @@
                             @if (Route::has('register'))
                                 <li class="nav-item">
                                     <a class="nav-link bg-success text-white py-2 px-3 rounded-lg"
-                                        href="{{ route('register') }}">{{ __('Book Now') }}</a>
+                                        href="{{ route('appointment.index') }}">{{ __('Book Now') }}</a>
                                 </li>
                             @endif
                         @else

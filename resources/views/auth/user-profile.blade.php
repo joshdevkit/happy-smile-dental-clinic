@@ -1,5 +1,12 @@
 @extends('client.app')
-
+<style>
+    .transac_card-body {
+        max-height: 300px;
+        /* Set desired max height for scrolling */
+        overflow-y: auto;
+        /* Enables vertical scrolling */
+    }
+</style>
 @section('header')
     <div class="content-header">
         <div class="container-fluid">
@@ -65,6 +72,32 @@
                         </form>
                     </div>
                 </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Transaction Summary</h3>
+                    </div>
+                    <div class="card-body overflow-auto transac_card-body" style="max-height: 300px;">
+                        @foreach ($data as $record)
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6 class="text-success">Date/Time:</h6>
+                                <h6>{{ date('F d, Y', strtotime($record->schedule->date_added)) }} -
+                                    {{ date('h:i A', strtotime($record->start_time)) }}
+                                    {{ date('h:i A', strtotime($record->end_time)) }} </h6>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6 class="text-success">Service:</h6>
+                                <h6>{{ $record->service->name }}</h6>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6 class="text-success">Service Price:</h6>
+                                <h6>{{ $record->service->price }}</h6>
+                            </div>
+                            <hr>
+                        @endforeach
+                    </div>
+                </div>
+
+
             </div>
 
             <div class="col-md-9">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClientSchedules;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,8 +16,10 @@ class ProfileController extends Controller
          * @var App\Models\User
          */
         $user = Auth::user();
+
+        $data = ClientSchedules::with(['service', 'schedule'])->where('user_id', Auth::user()->id)->get();
         if ($user->hasRole('Client')) {
-            return view('auth.user-profile', compact('user'));
+            return view('auth.user-profile', compact('user', 'data'));
         } else {
             return view('auth.profile', compact('user'));
         }

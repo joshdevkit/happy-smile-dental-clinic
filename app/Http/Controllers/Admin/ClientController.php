@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ClientSchedules;
+use App\Models\PaymentScheduleData;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -32,9 +33,10 @@ class ClientController extends Controller
 
     public function show(string $id)
     {
+        $client = User::find($id);
         $clientsRecord = ClientSchedules::with(['service', 'schedule', 'user'])->where('user_id', $id)->get();
         $totalRecord = ClientSchedules::where('user_id', $id)->count();
-        return view('admin.clients.record', compact('clientsRecord', 'totalRecord'));
+        return view('admin.clients.record', compact('clientsRecord', 'totalRecord', 'client'));
     }
 
 
@@ -100,5 +102,28 @@ class ClientController extends Controller
                 'error' => 'User not found'
             ], 404);
         }
+    }
+
+
+    public function paid(Request $request)
+    {
+        $validatedData = $request->validate([
+            'transactionID' => 'required|exists:client_schedules,id',
+            'payment' => 'required|string',
+            'remarks' => 'nullable|string|max:255',
+            'paymentDate' => 'required|date',
+        ]);
+
+        $record = ClientSchedules::findOrFail($validatedData['transactionID']);
+        $record->update(['status' => 'Success']);
+
+        PaymentScheduleData::create([
+            'client_schedule_id' => $validatedData['transactionID'],
+            'payment_method' => $validatedData['payment'],
+            'remarks' => $validatedData['remarks'],
+            'payment_date' => $validatedData['paymentDate'],
+        ]);
+
+        return redirect()->back()->with('success', 'Payment added successfully');
     }
 }

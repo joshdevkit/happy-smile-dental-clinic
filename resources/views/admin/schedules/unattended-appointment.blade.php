@@ -46,6 +46,8 @@
                                     @if ($record->user_id)
                                         {{ $record->user->first_name }} {{ $record->user->middle_name }}
                                         {{ $record->user->last_name }}
+                                    @elseif (!$record->user_id && $record->is_guest)
+                                        {{ $record->guest_name }}
                                     @else
                                         {{ $record->walk_in_name }}
                                     @endif
@@ -73,6 +75,9 @@
                                         @if ($record->user_id && $record->walk_in == 1)
                                             Walk-In Registered Client
                                         @elseif ($record->user_id)
+                                            Online
+                                        @elseif (!$record->user_id && $record->is_guest)
+                                            (Guest)
                                             Online
                                         @else
                                             Walk-In Guest

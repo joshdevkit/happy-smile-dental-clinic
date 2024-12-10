@@ -49,6 +49,15 @@
                         </button>
                     </div>
                 @endif
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <div id="calendar"></div>
 
@@ -75,11 +84,13 @@
                         @foreach ($records as $data)
                             @foreach ($data->record as $row)
                                 <tr>
-                                    <td>{{ $data->id }}</td>
+                                    <td>{{ $row->id }}</td>
                                     <td>
                                         @if ($row->user_id)
                                             {{ $row->user->first_name }} {{ $row->user->middle_name }}
                                             {{ $row->user->last_name }} {{ $row->user->suffix ?? '' }}
+                                        @elseif (!$row->user_id && $row->is_guest)
+                                            {{ $row->guest_name }}
                                         @else
                                             {{ $row->walk_in_name }}
                                         @endif
@@ -87,14 +98,16 @@
 
                                     <td>{{ $row->service->name ?? 'N/A' }}</td>
                                     <td>{{ date('F d, Y', strtotime($data->date_added)) }}
-                                        {{ date('h:i A', strtotime($data->start_time)) }}
+                                        {{ date('h:i A', strtotime($row->start_time)) }}
                                     </td>
                                     <td>
                                         {{ date('F d, Y', strtotime($data->date_added)) }}
-                                        {{ date('h:i A', strtotime($data->end_time)) }}
+                                        {{ date('h:i A', strtotime($row->end_time)) }}
                                     </td>
                                     <td>
-                                        <button class="btn btn-primary btn-sm">Reschedule</button>
+                                        <button type="button" class="btn btn-sm btn-primary resched" data-toggle="modal"
+                                            data-target="#rescheduleModal" data-id="{{ $row->id }}"
+                                            data-service="{{ $row->service->name }}">Re-schedule</button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -102,6 +115,60 @@
                     </tbody>
 
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- resched modal -->
+
+    <div class="modal fade" id="rescheduleModal" tabindex="-1" role="dialog" aria-labelledby="rescheduleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rescheduleModalLabel">Re-schedule</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="rescheduleForm" action="{{ route('admin.reschedule') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" name="schedule_id" id="scheduleId">
+                        <input type="hidden" name="new_date_id" id="new_date_id">
+                        <div class="form-group">
+                            <label for="resched_service_name">Service</label>
+                            <input readonly type="text" name="resched_service_name" id="resched_service_name"
+                                class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resched_date_to_change">Select Avaiable Date</label>
+                            <input type="date" name="resched_date_to_change" id="resched_date_to_change"
+                                class="form-control">
+                            <div class="feedback"></div>
+                            <p class="link"></p>
+                        </div>
+
+                        <div class="form-group d-none" id="startTimeDataform">
+                            <label for="reschedstartTimeData">Start Time</label>
+                            <input type="text" name="reschedstartTimeData" id="reschedstartTimeData"
+                                class="form-control validate">
+                            <div class="invalid-feedback">Choose a Start Time</div>
+                        </div>
+                        <div class="form-group d-none" id="endTimeDataform">
+                            <label for="reschedendTimeData">End Time</label>
+                            <input type="text" name="reschedendTimeData" id="reschedendTimeData"
+                                class="form-control validate">
+                            <div class="invalid-feedback">Choose a End Time</div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -558,6 +625,87 @@
                     }
                 });
             });
+
+            $(document).on('click', '.resched', function() {
+                var today = new Date();
+                var day = ("0" + today.getDate()).slice(-2);
+                var month = ("0" + (today.getMonth() + 1)).slice(-2);
+                var year = today.getFullYear();
+                var formattedDate = year + "-" + month + "-" + day;
+
+                $("#resched_date_to_change").attr("min", formattedDate);
+                var schedId = $(this).data('id')
+                $('#resched_service_name').val($(this).data('service'))
+                $('#scheduleId').val(schedId)
+                $('#resched_date_to_change').on('change', function() {
+                    var selectedDate = $(this).val()
+                    $.ajax({
+                        url: '{{ route('admin.check-dates') }}',
+                        type: 'GET',
+                        data: {
+                            date: selectedDate
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log(response);
+                            if (response.data.length === 0) {
+                                $("#startTimeDataform").addClass('d-none');
+                                $('#endTimeDataform').addClass('d-none');
+                                $('#resched_date_to_change').removeClass('is-valid')
+                                    .addClass(
+                                        'is-invalid');
+                                $('.feedback').html(
+                                        '<div><p>Date is not available. Please choose another date.</p></div>'
+                                    )
+                                    .removeClass('text-success')
+                                    .addClass('text-danger');
+                                $('#submitBtn').prop('disabled', true)
+
+                            } else {
+                                $('.link').addClass('d-none')
+                                $("#startTimeDataform").removeClass('d-none');
+                                $('#endTimeDataform').removeClass('d-none');
+                                $('#resched_date_to_change').removeClass('is-invalid')
+                                    .addClass(
+                                        'is-valid');
+
+                                $('.feedback').html(
+                                        '<div><p>This Date is eligible for re-scheduling.</p></div>'
+                                    )
+                                    .removeClass('text-danger')
+                                    .addClass('text-success');
+                            }
+                            let scheduleStartTime = response.data[0].start_time;
+                            let scheduleEndTime = response.data[0].end_time;
+                            $('#new_date_id').val(response.data[0].id)
+                            if (!$('#reschedstartTimeData').data('flatpickr')) {
+                                $('#reschedstartTimeData').flatpickr({
+                                    enableTime: true,
+                                    noCalendar: true,
+                                    dateFormat: "H:i",
+                                    time_24hr: false,
+                                    minTime: scheduleStartTime,
+                                    maxTime: scheduleEndTime,
+                                });
+                            }
+
+                            if (!$('#reschedendTimeData').data('flatpickr')) {
+                                $('#reschedendTimeData').flatpickr({
+                                    enableTime: true,
+                                    noCalendar: true,
+                                    dateFormat: "H:i",
+                                    time_24hr: false,
+                                    minTime: scheduleStartTime,
+                                    maxTime: scheduleEndTime,
+                                });
+                            }
+                        }
+                    })
+                })
+            })
 
         });
     </script>

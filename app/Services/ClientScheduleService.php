@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ClientSchedules;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ClientScheduleService
 {
@@ -33,8 +34,8 @@ class ClientScheduleService
             'schedule' => [
                 'id' => $data->schedule->id,
                 'date_added' => Carbon::parse($data->schedule->date_added)->format('M/d/Y'),
-                'start_time' => date('h:i A', strtotime($data->schedule->start_time)),
-                'end_time' => date('h:i A', strtotime($data->schedule->end_time)),
+                'start_time' => date('h:i A', strtotime($data->start_time)),
+                'end_time' => date('h:i A', strtotime($data->end_time)),
             ],
             'service' => [
                 'id' => $data->service->id,
@@ -57,10 +58,21 @@ class ClientScheduleService
     public function getAdminScheduleDetails($SchedId)
     {
         $data = ClientSchedules::with(['schedule', 'service', 'user'])->find($SchedId);
-
-        $fullName = $data->user_id
-            ? trim("{$data->user->first_name} {$data->user->middle_name} {$data->user->last_name}")
-            : $data->walk_in_name;
+        /**
+         * @var App\Models\User;
+         */
+        $admin = Auth::user();
+        if ($admin->hasRole('Admin')) {
+            $fullName = $data->is_guest
+                ? $data->guest_name
+                : ($data->user_id
+                    ? trim("{$data->user->first_name} {$data->user->middle_name} {$data->user->last_name}")
+                    : $data->walk_in_name);
+        } else {
+            $fullName = $data->user_id
+                ? trim("{$data->user->first_name} {$data->user->middle_name} {$data->user->last_name}")
+                : "Unknown";
+        }
 
         return [
             'id' => $data->id,

@@ -25,8 +25,9 @@
 @section('content')
     <div class="container-fluid mt-3 py-4">
         <div class="col-md-4 d-flex justify-content-between">
+
             <input disabled type="text"
-                value="{{ $clientsRecord->first()->user->first_name . ' ' . $clientsRecord->first()->user->middle_name . ' ' . $clientsRecord->first()->user->last_name }}"
+                value="{{ $client->first_name . ' ' . $client->middle_name . ' ' . $client->last_name }}"
                 class="form-control mr-3">
             <input disabled type="text" value="{{ $totalRecord }}" class="form-control">
         </div>

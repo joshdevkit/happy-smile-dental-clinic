@@ -16,7 +16,12 @@ class ClientSchedules extends Model
         'start_time',
         'end_time',
         'walk_in',
-        'walk_in_name'
+        'walk_in_name',
+        'is_guest',
+        'guest_name',
+        'guest_contact',
+        'guest_email',
+        'status'
     ];
 
 
@@ -41,5 +46,11 @@ class ClientSchedules extends Model
     public function patient()
     {
         return $this->belongsTo(User::class);
+    }
+
+
+    public function followup()
+    {
+        return $this->hasOne(FollowUp::class, 'record_id');
     }
 }

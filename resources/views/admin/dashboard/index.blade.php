@@ -252,42 +252,76 @@
 
 
     <script>
-        const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
-        const visitorsChart = new Chart(visitorsCtx, {
-            type: 'line',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'Visitors',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    borderColor: 'rgba(60,141,188,0.8)',
-                    backgroundColor: 'rgba(60,141,188,0.4)',
-                    fill: true,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-            }
+        $(document).ready(function() {
+            $.ajax({
+                url: 'visitors-insight',
+                type: 'GET',
+                success: function(data) {
+                    const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
+                    const visitorsChart = new Chart(visitorsCtx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                    label: 'Guests',
+                                    data: data.guests,
+                                    borderColor: 'rgba(60,141,188,0.8)',
+                                    backgroundColor: 'rgba(60,141,188,0.4)',
+                                    fill: true,
+                                },
+                                {
+                                    label: 'Registered Clients',
+                                    data: data.registered_clients,
+                                    borderColor: 'rgba(75,192,192,0.8)',
+                                    backgroundColor: 'rgba(75,192,192,0.4)',
+                                    fill: true,
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
         });
+    </script>
 
-        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-        const revenueChart = new Chart(revenueCtx, {
-            type: 'bar',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: [5000, 4000, 3000, 10000, 7000, 6000, 8000],
-                    backgroundColor: 'rgba(0, 166, 90, 0.8)',
-                    borderColor: 'rgba(0, 166, 90, 1)',
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-            }
+    <script>
+        $(document).ready(function() {
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            let revenueChart;
+
+            $.ajax({
+                url: 'revenue-data',
+                method: 'GET',
+                success: function(response) {
+                    revenueChart = new Chart(revenueCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: response.labels,
+                            datasets: [{
+                                label: 'Revenue',
+                                data: response.revenue,
+                                backgroundColor: 'rgba(0, 166, 90, 0.8)',
+                                borderColor: 'rgba(0, 166, 90, 1)',
+                                borderWidth: 1,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching chart data:', error);
+                }
+            });
         });
     </script>
 @endpush

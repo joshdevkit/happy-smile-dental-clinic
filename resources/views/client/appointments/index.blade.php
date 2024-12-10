@@ -35,8 +35,8 @@
                             <th>Patient Name</th>
                             <th>Service</th>
                             <th>Appointment Date</th>
-                            <th>Service Price</th>
-                            <th>Status</th>
+                            {{-- <th>Service Price</th> --}}
+                            {{-- <th>Status</th> --}}
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -48,8 +48,8 @@
                                 </td>
                                 <td>{{ $schedule->service->name }}</td>
                                 <td>{{ \Carbon\Carbon::parse($schedule->schedule->date_added)->format('M/d/Y') }}</td>
-                                <td>{{ $schedule->service->price }}</td>
-                                <td>
+                                {{-- <td>{{ $schedule->service->price }}</td> --}}
+                                {{-- <td>
                                     <span
                                         class="badge
                                         @if ($schedule->status == 'Pending') badge-warning
@@ -59,7 +59,7 @@
                                         @elseif($schedule->status == 'Cancelled') badge-dark @endif">
                                         {{ $schedule->status }}
                                     </span>
-                                </td>
+                                </td> --}}
                                 <td>
                                     @php
                                         $scheduledDate = \Carbon\Carbon::parse($schedule->schedule->date_added);
@@ -107,6 +107,7 @@
                             <label for="date_to_change">Select Avaiable Date</label>
                             <input type="date" name="date_to_change" id="date_to_change" class="form-control">
                             <div class="feedback"></div>
+                            <p class="link"></p>
                         </div>
 
                         <div class="form-group d-none" id="startTimeDataform">
@@ -122,7 +123,7 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Save changes</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </form>
@@ -163,17 +164,23 @@
                     dataType: 'json',
                     success: function(response) {
                         console.log(response);
-                        if (response.data === '') {
+                        if (response.data.length === 0) {
                             $("#startTimeDataform").addClass('d-none');
                             $('#endTimeDataform').addClass('d-none');
-
+                            $('.link').addClass('d-none').removeClass('d-none')
                             $('#date_to_change').removeClass('is-valid').addClass('is-invalid');
 
                             $('.feedback').html(
-                                    '<div><p>Date is not available to the Schedule.</p></div>')
+                                    '<div><p>Date is not available. Please choose another date.</p></div>'
+                                )
                                 .removeClass('text-success')
                                 .addClass('text-danger');
+                            $('#submitBtn').prop('disabled', true)
+                            $('.link').html(
+                                '<a href="{{ route('client.dashboard') }}">Check your Dashboard here...</a>'
+                            )
                         } else {
+                            $('.link').addClass('d-none')
                             $("#startTimeDataform").removeClass('d-none');
                             $('#endTimeDataform').removeClass('d-none');
 

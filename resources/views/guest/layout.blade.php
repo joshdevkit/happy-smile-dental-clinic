@@ -37,8 +37,95 @@
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        @include('client.nav')
-        @include('client.aside')
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light sticky-top">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
+                            class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="fas fa-user-circle"></i>
+                        {{ Session::get('otp_email') }}
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <style>
+            .active-link {
+                background-color: green !important;
+                color: #fff !important;
+            }
+
+            .nav-link {
+                transition: background-color 0.3s ease, color 0.3s ease;
+                color: #000;
+                text-decoration: none;
+            }
+
+            .nav-link:hover {
+                background-color: darkgreen !important;
+                color: white !important;
+            }
+
+            .nav-link.active-link:hover {
+                background-color: green !important;
+            }
+        </style>
+
+
+        <aside class="main-sidebar bg-white sidebar-white elevation-4">
+            <a href="{{ route('client.dashboard') }}" class="text-center d-block">
+                <img src="{{ asset('client/dist/img/brand.jpg') }}" alt="AdminLTE Logo" class="brand-image mb-2"
+                    style="opacity: .8; max-width: 100%; height: auto;">
+            </a>
+            <hr>
+            <div class="sidebar">
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="false">
+                        <li class="nav-item">
+                            <a href="{{ route('guest.homepage') }}"
+                                class="nav-link {{ request()->routeIs('guest.homepage') ? 'active-link' : '' }}">
+                                <i class="nav-icon fas fa-home"></i>
+                                <p>
+                                    Available Schedules
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" id="findAppointmentLink">
+                                <i class="nav-icon fas fa-search"></i>
+                                <p>
+                                    Find my Appointment
+                                </p>
+                            </a>
+                        </li>
+
+                        <div class="search-container" style="display:none;">
+                            <input type="text" id="tracking_number" class="form-control"
+                                placeholder="Enter Tracking Number" />
+                            <button type="button" id="searchAppointment" class="btn btn-primary mt-2">Search</button>
+                            <div id="searchResult" class="mt-3"></div>
+                        </div>
+                        <li class="nav-item">
+                            <a href="{{ url('/') }}" class="nav-link" id="findAppointmentLink">
+                                <i class="nav-icon fas fa-angle-left"></i>
+                                <p>
+                                    Go back to Homepage
+                                </p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+            </div>
+        </aside>
+
 
         <div class="content-wrapper">
             @yield('header')
@@ -100,6 +187,53 @@
                 "info": true,
                 "autoWidth": false,
                 "responsive": true,
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#findAppointmentLink').on('click', function(e) {
+                e.preventDefault();
+                $('.search-container').toggle();
+            });
+
+            $('#searchAppointment').on('click', function() {
+                var trackingNumber = $('#tracking_number').val().trim();
+
+                $('#searchResult').empty();
+                if (trackingNumber === "") {
+                    $('#searchResult').append(
+                        '<div class="alert alert-danger">Please enter a tracking number.</div>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route('search-appointment') }}',
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        tracking_number: trackingNumber
+                    },
+                    success: function(response) {
+                        if (!response.success) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Appointment not found',
+                                text: 'No appointment matches the provided tracking number.',
+                            });
+                        } else {
+                            window.location.href = `${response.url}`
+                        }
+                    },
+                    error: function() {
+                        $('#searchResult').append(
+                            '<div class="alert alert-danger">Something went wrong. Please try again later.</div>'
+                        );
+                    }
+                });
             });
         });
     </script>

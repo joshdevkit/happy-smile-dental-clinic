@@ -162,6 +162,7 @@
                                     <input type="text" name="startTimeData" id="startTimeData"
                                         class="form-control validate">
                                 </div>
+                                <p id="response"></p>
                                 <div class="form-group">
                                     <label for="endTimeData">End Time</label>
                                     <input type="text" name="endTimeData" id="endTimeData"
@@ -446,6 +447,33 @@
             if (formIsValid) {
                 this.submit();
             }
+        })
+
+        $('#startTimeData').on('change', function() {
+            var selectedSchedID = $('#selectedSchedID').val()
+            var startTime = $(this).val()
+            var endTimeData = $(this).val()
+            $.ajax({
+                url: '{{ route('check-status') }}',
+                type: 'POST',
+                data: {
+                    schedId: selectedSchedID,
+                    startTime: startTime,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response);
+                    if (response.status) {
+                        $('#startTimeData').addClass(
+                            'is-invalid');
+                        $('#response').html('<p class="text-danger">' + response.message +
+                            '</p>');
+                    }
+                }
+            })
         })
     </script>
 @endsection

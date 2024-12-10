@@ -112,8 +112,9 @@ class SchedulesController extends Controller
 
     public function history()
     {
-        $history = ClientSchedules::with(['user', 'service', 'schedule'])->get();
-        return view('admin.schedules.history', compact('history'));
+        $services = Services::all();
+        $history = ClientSchedules::with(['user', 'service', 'schedule', 'followup'])->get();
+        return view('admin.schedules.history', compact('history', 'services'));
     }
 
 
@@ -144,11 +145,15 @@ class SchedulesController extends Controller
     {
         $date = $request->query('date');
         $data = Schedules::where('date_added', $date)->get();
+        if ($data->isEmpty()) {
+            $data = [];
+        }
 
         return response()->json([
             'data' => $data
         ]);
     }
+
 
 
     public function user_reschedule(Request $request)
@@ -183,6 +188,36 @@ class SchedulesController extends Controller
     }
 
 
+    public function admin_reschedule(Request $request)
+    {
+        $data = ClientSchedules::find($request->schedule_id);
+        if (!$data) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Schedule not found'
+            ]);
+        }
+
+        $validatedData = $request->validate(
+            [
+                'new_date_id' => 'required|exists:schedules,id',
+            ],
+            [
+                'new_date_id.required' => 'New date for rescheduling must be selected first'
+            ]
+        );
+
+        $newSchedule = Schedules::find($validatedData['new_date_id']);
+
+        $data->schedule_id = $validatedData['new_date_id'];
+        $data->start_time = $request->startTimeData;
+        $data->end_time = $request->endTimeData;
+        $data->save();
+
+        return redirect()->back()->with('success', 'Schedule updated successfully.');
+    }
+
+
     public function markNotAttended(Request $request)
     {
         $validated = $request->validate([
@@ -197,5 +232,26 @@ class SchedulesController extends Controller
             'success' => true,
             'message' => 'Appointment status updated successfully.',
         ]);
+    }
+
+
+    public function status(Request $request)
+    {
+        $sched = ClientSchedules::where('schedule_id', $request->input('schedId'))
+            ->where('start_time', $request->input('startTime'))
+            ->get();
+
+        if ($sched->isNotEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Time already occupied, please select another starting time',
+                'data' => $sched
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Time is available',
+            ]);
+        }
     }
 }
