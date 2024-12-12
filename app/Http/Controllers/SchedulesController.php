@@ -96,7 +96,6 @@ class SchedulesController extends Controller
     public function today()
     {
         $today = $this->scheduleService->getTodaySchedules();
-
         return view('admin.schedules.today-appointment', compact('today'));
     }
 
@@ -210,8 +209,8 @@ class SchedulesController extends Controller
         $newSchedule = Schedules::find($validatedData['new_date_id']);
 
         $data->schedule_id = $validatedData['new_date_id'];
-        $data->start_time = $request->startTimeData;
-        $data->end_time = $request->endTimeData;
+        $data->start_time = $request->reschedstartTimeData;
+        $data->end_time = $request->reschedendTimeData;
         $data->save();
 
         return redirect()->back()->with('success', 'Schedule updated successfully.');
@@ -253,5 +252,24 @@ class SchedulesController extends Controller
                 'message' => 'Time is available',
             ]);
         }
+    }
+
+
+    public function check_start_time(Request $request)
+    {
+        $start_time = $request->query('start_time');
+        $date = $request->query('date');
+
+        $schedule = Schedules::where('date_added', $date)->first();
+        $existingSchedules = ClientSchedules::where('schedule_id', $schedule->id)->first();
+        // dd($existingSchedules->start_time);
+        if ($start_time . ":00" == $existingSchedules->start_time) {
+            return response()->json([
+                'exist' => true
+            ]);
+        }
+        return response()->json([
+            'exist' => false
+        ]);
     }
 }

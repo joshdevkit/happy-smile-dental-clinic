@@ -42,9 +42,10 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::controller(AdminDashboardController::class)->prefix('admin')->group(function () {
+
+        Route::get('/dashboard', 'index')->name('admin.dashboard');
         Route::resource('admin-current-schedules', ClientSchedulesController::class);
         Route::get('admin-fetch-schedule/{id}', [ClientSchedulesController::class, 'admin_fetch'])->name('admin.fetch');
-        Route::get('/dashboard', 'index')->name('admin.dashboard');
         Route::resource('schedule', SchedulesController::class);
         Route::resource('follow-ups', FollowUpController::class);
         Route::get('admin-sched-data', [SchedulesController::class, 'getScheduleData'])->name('admin-sched-data');
@@ -65,6 +66,9 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         Route::get('schedule/validate/{date}', [SchedulesController::class, 'date_validation'])->name('date.validate');
         Route::get('admin-check-date', [SchedulesController::class, 'check_dates'])->name('admin.check-dates');
         Route::post('schedule/today', [SchedulesController::class, 'markNotAttended'])->name('appointments.updateStatus');
+
+        //check start time route
+        Route::get('history', [SchedulesController::class, 'check_start_time'])->name('admin.start_time_check');
         Route::post('reschedule', [SchedulesController::class, 'admin_reschedule'])->name('admin.reschedule');
         Route::post('schedule/payment', [ClientController::class, 'paid'])->name('payment');
 

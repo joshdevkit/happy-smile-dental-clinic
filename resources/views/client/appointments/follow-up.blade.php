@@ -46,31 +46,31 @@
                                 <td>{{ Auth::user()->first_name }} {{ Auth::user()->middle_name ?? '' }}
                                     {{ Auth::user()->last_name }}</td>
                                 <td>{{ $record->service->name }}</td>
-                                <td>{{ $record->followup->service->name }}</td>
+                                <td>{{ $record->schedule->service->name }}</td>
                                 <td>
-                                    {{ date('F d, Y', strtotime($record->followup->date)) }} -
-                                    {{ date('h:i A', strtotime($record->followup->start_time)) }} to
-                                    {{ date('h:i A', strtotime($record->followup->end_time)) }}
+                                    {{ date('F d, Y', strtotime($record->date)) }} -
+                                    {{ date('h:i A', strtotime($record->start_time)) }} to
+                                    {{ date('h:i A', strtotime($record->end_time)) }}
                                 </td>
                                 <td>
                                     @php
-                                        $followUpCreatedAt = \Carbon\Carbon::parse($record->followup->created_at);
+                                        $followUpCreatedAt = \Carbon\Carbon::parse($record->created_at);
                                         $currentTime = \Carbon\Carbon::now();
 
                                         $timeDiffInMinutes = $currentTime->diffInMinutes($followUpCreatedAt);
                                     @endphp
 
-                                    @if ($record->followup->is_accepted == 0)
+                                    @if ($record->is_accepted == 0)
                                         @if ($timeDiffInMinutes <= 60)
                                             <button class="btn btn-sm btn-success btn-accept"
-                                                data-id="{{ $record->followup->id }}">Accept</button>
+                                                data-id="{{ $record->id }}">Accept</button>
                                             <button class="btn btn-sm btn-danger btn-decline"
-                                                data-id="{{ $record->followup->id }}">Decline</button>
+                                                data-id="{{ $record->id }}">Decline</button>
                                         @else
                                             <button class="btn btn-sm btn-success btn-accept" disabled>Accept</button>
                                             <button class="btn btn-sm btn-danger btn-decline" disabled>Decline</button>
                                         @endif
-                                    @elseif($record->followup->is_accepted == 2)
+                                    @elseif($record->is_accepted == 2)
                                         <span class="badge badge-danger">Rejected</span>
                                     @else
                                         <span class="badge badge-success">Accepted</span>

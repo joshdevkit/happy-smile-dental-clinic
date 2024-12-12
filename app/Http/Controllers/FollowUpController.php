@@ -54,8 +54,7 @@ class FollowUpController extends Controller
 
     public function user()
     {
-        $data = ClientSchedules::with('followup.service')
-            ->where('user_id', Auth::user()->id)
+        $data = FollowUp::with('schedule.service')
             ->get();
 
         $dataWithFollowups = $data->filter(function ($record) {
@@ -73,7 +72,7 @@ class FollowUpController extends Controller
             }
         }
 
-        $data = [];
+        // $data = [];
 
         return view('client.appointments.follow-up', compact('data'));
     }

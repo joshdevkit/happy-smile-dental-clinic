@@ -105,9 +105,16 @@
                                         {{ date('h:i A', strtotime($row->end_time)) }}
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-primary resched" data-toggle="modal"
-                                            data-target="#rescheduleModal" data-id="{{ $row->id }}"
-                                            data-service="{{ $row->service->name }}">Re-schedule</button>
+                                        @php
+                                            $currentDate = Carbon\Carbon::now()->subDay(2);
+                                        @endphp
+                                        @if ($data->date_added > $currentDate)
+                                            <button type="button" class="btn btn-sm btn-primary resched"
+                                                data-toggle="modal" data-target="#rescheduleModal"
+                                                data-id="{{ $row->id }}"
+                                                data-service="{{ $row->service->name }}">Re-schedule</button>
+                                        @endif
+
                                     </td>
                                 </tr>
                             @endforeach

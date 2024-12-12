@@ -104,6 +104,7 @@
                                                 data-full-name="{{ $schedule->user_id ? $schedule->full_name : $schedule->walk_in_name }}"
                                                 data-service-name="{{ $schedule->service_name ?? 'N/A' }}"
                                                 data-service-price="{{ $schedule->service_price }}"
+                                                data-reservation-price="{{ $schedule->reservation_fee }}"
                                                 data-appointment-date="{{ date('F d, Y', strtotime($schedule->date_added)) }} {{ date('h:i A', strtotime($schedule->end_time)) }} - {{ date('h:i A', strtotime($schedule->start_time)) }} ">
                                                 Paid
                                             </button>
@@ -265,11 +266,12 @@
                 var service_name = $(this).data('service-name');
                 var appointment_date = $(this).data('appointment-date');
                 var service_price = $(this).data('service-price');
-
+                var reservation_fee = $(this).data('reservation-price')
+                var totalAmount = parseFloat(reservation_fee) + parseFloat(service_price)
                 $('#clientName').val(full_name);
                 $('#serviceName').val(service_name);
                 $('#appointmentDate').val(appointment_date);
-                $('#amount').val(service_price)
+                $('#amount').val(totalAmount)
                 $('#paymentModal').modal('show')
 
             });

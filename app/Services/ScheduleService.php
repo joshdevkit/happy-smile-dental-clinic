@@ -28,6 +28,7 @@ class ScheduleService
                 'client_schedules.walk_in_name',
                 'services.name as service_name',
                 'services.price as service_price',
+                'services.reserve_fee as reservation_fee',
                 'schedules.date_added',
                 'client_schedules.start_time',
                 'client_schedules.end_time',
@@ -36,7 +37,7 @@ class ScheduleService
                 'p.client_schedule_id as client_sched_id',
                 DB::raw("CONCAT(users.first_name, ' ', IFNULL(users.middle_name, ''), ' ', users.last_name, ' ', IFNULL(users.suffix, '')) as full_name")
             )
-            ->whereDate('client_schedules.created_at', today())
+            ->whereDate('schedules.date_added', today())
             ->where('client_schedules.status', '!=', 'Not Attended')
             ->get();
     }
